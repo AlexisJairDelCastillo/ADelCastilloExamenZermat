@@ -1,0 +1,123 @@
+﻿@model ML.Pedido
+@{
+    ViewData["Title"] = "Form";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <h2><strong>@ViewBag.Titulo</strong></h2>
+        <h5>Si cuentas con un codigo de descuento introducelo en el campo Cupon.</h5>
+    </div>
+
+    <hr />
+
+    @using (Html.BeginForm("Form", "Pedido", FormMethod.Post, new { enctype = "multipart/form-data" }))
+    {
+        <div class="row">
+            <div class="col-md-3">
+                @Html.LabelFor(model => model.IdPedido, new { @class = "control-label col-md-2 visually-hidden" })
+                @Html.TextBoxFor(model => model.IdPedido, new { @class = "form-control visually-hidden", @readonly = true })
+                @Html.ValidationMessageFor(model => model.IdPedido)
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-3">
+                @Html.LabelFor(model => model.Cliente.IdCliente, new { @class = "control-label col-md-2" })
+                @Html.DropDownListFor(model => model.Cliente.IdCliente, new SelectList(Model.Cliente.Clientes, "IdCliente", "Nombre"), "Selecciona tu usuario: ", new { @class = "form-control" })
+            </div>
+
+            <div class="col-md-3">
+               @Html.LabelFor(model => model.Producto.Categoria, new {@class = "control-label col-md-2"})
+               @Html.DropDownListFor(model => model.Producto.Categoria.IdCategoria, new SelectList(Model.Producto.Categoria.Categorias, "IdCategoria", "NombreCategoria"), "Selecciona una categoria: ", new {@class = "form-control", @id = "ddlCategoria"})
+               @Html.ValidationMessageFor(model => model.Producto.Categoria.IdCategoria)
+            </div>
+
+            <div class="col-md-3">
+                @Html.LabelFor(model => model.Producto, new { @class = "control-label col-md-2" })
+                @if (Model.Producto.Productos == null || Model.Producto.Productos.Count == 0)
+                {
+                    @Html.DropDownListFor(model => model.Producto.IdProducto, new SelectList(string.Empty, "Value", "Text"), "Selecciona un producto: ", new { @class = "form-control", @id = "ddlProducto" })
+                    @Html.ValidationMessageFor(model => model.Producto.IdProducto)
+                }
+                else
+                {
+                    @Html.DropDownListFor(model => model.Producto.IdProducto, new SelectList(Model.Producto.Productos, "IdProducto", "NombreProducto"), "Selecciona un producto: ", new { @class = "form-control", @id = "ddlProducto" })
+                    @Html.ValidationMessageFor(model => model.Producto.IdProducto)
+                }
+            </div>
+
+            <div class="col-md-3">
+                @Html.LabelFor(model => model.Cantidad, new { @class = "control-label col-md-2" })
+                @Html.TextBoxFor(model => model.Cantidad, new { @class = "form-control" })
+                @Html.ValidationMessageFor(model => model.Cantidad)
+            </div>
+        </div>
+
+        <br />
+
+        <div class="row">
+            <div class="col-md-3">
+                @Html.LabelFor(model => model.Cupon, new { @class = "control-label col-md-2" })
+                @Html.TextBoxFor(model => model.Cupon, new { @class = "form-control" })
+                @Html.ValidationMessageFor(model => model.Cupon)
+            </div>
+        </div>
+
+        <br />
+
+        <div class="row">
+            <div class="col-md-4">
+            </div>
+
+            <div class="col-md-2">
+                <div class="form-group">
+                    <div class="col-md-offset-2 col-md-10">
+                        <input type="submit" value="@ViewBag.Accion" class="btn btn-success" />
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-2">
+                <div class="form-group">
+                    <div class="col-md-offset-2 col-md-10">
+                        @Html.ActionLink("Regresar", "GetAll", "Pedido", htmlAttributes: new { @class = "btn btn-secondary" })
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+            </div>
+        </div>
+    }
+</div>
+
+@section Scripts{
+    <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js" integrity="sha256-lSjKY0/srUM9BE3dPm+c4fBo1dky2v27Gdjm2uoZaL0=" crossorigin="anonymous"></script>
+
+    <script type="text/javascript">
+        $(document).ready(function(){
+            $("#ddlCategoria").change(function () {
+                $("#ddlProducto").empty();
+                $.ajax({
+                    type: 'GET',
+                    url: '@Url.Action("GetProductos")',
+                    dataType: 'json',
+                    data: { idCategoria: $("#ddlCategoria").val() },
+                    success: function (productos) {
+                        $("#ddlProducto").append('<option value="0">' + 'Seleccione un producto: ' + '</option>');
+                        $.each(productos.objects, function (i, productos) {
+                            $("#ddlProducto").append('<option value="'
+                                + productos.idProducto + '">'
+                                + productos.nombreProducto + '</option>');
+                        });
+                    },
+                    error: function (ex) {
+                        alert('Failed.' + ex);
+                    }
+                });
+            });
+        });
+    </script>
+}

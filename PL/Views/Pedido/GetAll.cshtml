@@ -1,0 +1,74 @@
+﻿@model ML.Pedido
+@{
+    ViewData["Title"] = "GetAll";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <h1 style="text-align:center"><strong>Pedidos</strong></h1>
+    </div>
+
+    <hr />
+
+    <div class="row">
+        <div class="col-md-1">
+            @Html.ActionLink("Comprar", "Form", "Pedido", htmlAttributes: new { @class = "btn btn-success bi bi-cart-plus-fill" })
+        </div>
+    </div>
+
+    <br />
+
+    <div class="row">
+        @if(Model != null)
+        {
+            <table class="table table-responsive table-hover table-striped table-dark">
+                <thead>
+                    <tr>
+                        <td class="visually-hidden">IdPedido</td>
+                        <td class="visually-hidden">IdCliente</td>
+                        <td>Nombre</td>
+                        <td>Apellido Paterno</td>
+                        <td>Apellido Materno</td>
+                        <td class="visually-hidden">IdProducto</td>
+                        <td>Producto</td>
+                        <td>Descripción</td>
+                        <td>Precio</td>
+                        <td>Cantidad</td>
+                        <td>Cupon</td>
+                        <td>Total</td>
+                        <td>Cancelar</td>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (ML.Pedido pedido in Model.Pedidos)
+                    {
+                        <tr>
+                            <td class="visually-hidden">@pedido.IdPedido</td>
+                            <td class="visually-hidden">@pedido.Cliente.IdCliente</td>
+                            <td>@pedido.Cliente.Nombre</td>
+                            <td>@pedido.Cliente.ApellidoPaterno</td>
+                            <td>@pedido.Cliente.ApellidoMaterno</td>
+                            <td class="visually-hidden">@pedido.Producto.IdProducto</td>
+                            <td>@pedido.Producto.NombreProducto</td>
+                            <td>@pedido.Producto.Descripcion</td>
+                            <td>$@pedido.Producto.Precio</td>
+                            <td>@pedido.Cantidad</td>
+                            <td>@pedido.Cupon</td>
+                            <td>$@pedido.Total</td>
+                            <td>
+                                <a class="btn btn-danger bi bi-cart-x-fill" href="@Url.Action("Delete", "Pedido", new { IdPedido = pedido.IdPedido })" onclick="return confirm('¿Estas seguro que deseas cancelar esta compra?');"></a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+        else
+        {
+            <div class="alert alert-danger" role="alert">
+                <p>Aun no se han realizado compras.</p>
+            </div>
+        }
+    </div>
+</div>
